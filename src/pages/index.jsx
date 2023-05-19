@@ -5,7 +5,7 @@ import { verifica } from '../services/user'
 export default function Home() {
   return (
     <div>
-      Safe Page
+      <h1>Bem Vindo!</h1>
     </div>
   )
 }
