@@ -50,7 +50,7 @@ export default function LoginPage() {
                 <form onSubmit={handleForm} className=" flex flex-col gap-3 w-auto mt-4">
                     <Input type="email" placeholder="Seu e-mail" required value={formData.email} onChange={(e) => {handleFormEdit(e, 'email')}} />
                     <Input type="password" placeholder="Sua senha" required value={formData.password} onChange={(e) => {handleFormEdit(e, 'password')}} />
-                    <Button>Criar</Button>
+                    <Button>Entrar</Button>
                     {error && <p className="text-red-500 font-bold">{error}</p>}
                     <Link href="/register">Ainda não possui conta?</Link>
                 </form>
