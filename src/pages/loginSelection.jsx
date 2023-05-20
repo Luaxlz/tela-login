@@ -1,7 +1,7 @@
 import Button from "../components/Button";
 import { useRouter } from "next/router"
 
-export default function loginSelectionPage() {
+export default function LoginSelectionPage() {
     const router = useRouter()
     return (
         <div className={`
