@@ -43,7 +43,7 @@ export default function RegisterPage() {
 
     return (
         <div className={`
-            bg-black h-screen
+            bg-gradient-to-b from-black via-gray-900 to-gray-800 w-screen h-screen
             flex justify-center items-center
         `}>
             <LoginCard tittle="Crie sua conta">

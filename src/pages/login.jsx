@@ -42,7 +42,7 @@ export default function LoginPage() {
 
     return (
         <div className={`
-            bg-gradient-to-t from-[#caf0f8] via-[#00b4d8] to-[#03045e] w-screen h-screen
+        bg-gradient-to-b from-black via-gray-900 to-gray-800 w-screen h-screen
             flex justify-center items-center
 
         `}>
@@ -52,7 +52,10 @@ export default function LoginPage() {
                     <Input type="password" placeholder="Sua senha" required value={formData.password} onChange={(e) => {handleFormEdit(e, 'password')}} />
                     <Button>Entrar</Button>
                     {error && <p className="text-red-500 font-bold">{error}</p>}
-                    <Link href="/register">Ainda não possui conta?</Link>
+                    <div className="flex justify-around">
+                        <Link href="/register">Ainda não possui conta?</Link>
+                        <Link href="/loginSelection">Fazer login de outra forma?</Link>
+                    </div>
                 </form>
             </LoginCard>
         </div>
