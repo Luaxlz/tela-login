@@ -42,15 +42,15 @@ export default function LoginPage() {
 
     return (
         <div className={`
-            bg-black h-screen
+            bg-gradient-to-t from-[#caf0f8] via-[#00b4d8] to-[#03045e] w-screen h-screen
             flex justify-center items-center
 
         `}>
             <LoginCard tittle='Entre em sua conta' >
-                <form onSubmit={handleForm} className=" flex flex-col gap-2 w-auto mt-4">
+                <form onSubmit={handleForm} className=" flex flex-col gap-3 w-auto mt-4">
                     <Input type="email" placeholder="Seu e-mail" required value={formData.email} onChange={(e) => {handleFormEdit(e, 'email')}} />
                     <Input type="password" placeholder="Sua senha" required value={formData.password} onChange={(e) => {handleFormEdit(e, 'password')}} />
-                    <Button>Criar</Button>
+                    <Button>Entrar</Button>
                     {error && <p className="text-red-500 font-bold">{error}</p>}
                     <Link href="/register">Ainda não possui conta?</Link>
                 </form>
