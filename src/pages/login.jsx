@@ -1,44 +1,34 @@
-import Link from "next/link"
-import Button from "../components/Button"
-import Input from "../components/Input"
-import LoginCard from "../components/LoginCard"
-import { useState } from "react"
-import { setCookie } from "cookies-next"
-import { useRouter } from "next/router"
+import Link from "next/link";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import LoginCard from "../components/LoginCard";
+import { useState } from "react";
+import { auth } from "../lib/firebase";
+import Router from "next/router";
 
-export default function LoginPage() {
-    const [formData, setFormData] = useState ({
-        email: '',
-        password: ''
-    })
+export default function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    const [error, setError] = useState('')
-    const router = useRouter()
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value);
+    };
 
-    const handleFormEdit = (event, name) => {
-        setFormData({
-            ...formData,
-            [name]: event.target.value
-        })
-    }
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value);
+    };
 
-    const handleForm = async (event) => {
+    const handleLogin = async (event) => {
+        event.preventDefault();
+
         try {
-            event.preventDefault()
-            const response = await fetch(`/api/user/login`, {
-                method: 'POST',
-                body: JSON.stringify(formData)
-            })
-
-            const json = await response.json()
-            if (response.status !== 200) throw new Error(json)
-
-            setCookie('authorization', json)
-            router.push('/')
+            await auth.signInWithEmailAndPassword(email, password);
+            console.log('Usuário logado com sucesso!');
+            Router.push('/');
         } catch (error) {
-            setError(error.message)
-        }
-    }
+            console.log('Houve um erro ao entrar:', error.message);
+        };
+    };
 
     return (
         <div className={`
@@ -47,11 +37,10 @@ export default function LoginPage() {
 
         `}>
             <LoginCard tittle='Entre em sua conta' >
-                <form onSubmit={handleForm} className=" flex flex-col gap-3 w-auto mt-4">
-                    <Input type="email" placeholder="Seu e-mail" required value={formData.email} onChange={(e) => {handleFormEdit(e, 'email')}} />
-                    <Input type="password" placeholder="Sua senha" required value={formData.password} onChange={(e) => {handleFormEdit(e, 'password')}} />
-                    <Button>Entrar</Button>
-                    {error && <p className="text-red-500 font-bold">{error}</p>}
+                <form onSubmit={handleLogin} className=" flex flex-col gap-3 w-auto mt-4">
+                    <Input type="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
+                    <Input type="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
+                    <Button type='submit' >Entrar</Button>
                     <div className="flex justify-around">
                         <Link href="/register">Ainda não possui conta?</Link>
                         <Link href="/loginSelection">Fazer login de outra forma?</Link>

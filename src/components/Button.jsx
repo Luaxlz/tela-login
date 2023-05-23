@@ -1,8 +1,8 @@
 
 
-export default function Button({ children, disabled, ...props }) {
+export default function Button({ children, ...props }) {
     return (
-        <button disabled={disabled} className={`
+        <button className={`
             border-0 rounded-lg bg-[blueviolet]
             p-1 text-lg font-bold text-white
         `} {...props}>

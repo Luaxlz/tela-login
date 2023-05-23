@@ -1,33 +1,46 @@
-import { getCookie } from 'cookies-next'
-import { verifica } from '../services/user'
-import Link from 'next/link'
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import Button from "../components/Button";
+import LoginCard from "../components/LoginCard";
+import { auth } from "../lib/firebase";
 
 
 export default function Home() {
-  return (
-    <div>
-      <h1>Bem Vindo!</h1>
-      <Link href="/login">Sair</Link>
-    </div>
-  )
-}
+  const router = useRouter()
 
-export const getServerSideProps = async ({req, res}) => {
-  try {
-    const token = getCookie('authorization', { req, res })
-    if (!token) throw new Error('Token inválido')
-    
-    verifica(token)
-    return {
-      props: {}
-    }
-  } catch (error) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/loginSelection'
-      },
-      props: {}
-    }
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        router.push('/login'); // Redireciona para a página de login caso o usuário não esteja autenticado
+      }
+    });
+  
+    return () => unsubscribe(); // Cancela a inscrição do listener ao desmontar o componente
+  }, []);
+  
+
+  function handleLogout(event) {
+    auth.signOut()
+      .then(() => {
+        Router.push('/login');
+      })
+      .catch((error) => {
+        console.log('Erro ao efetuar logout:', error.message);
+      });
   }
-}
+  
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <LoginCard>
+        <h1 className="text-center text-[56px]">Bem Vindo!</h1>
+        <div className="flex justify-around">
+          <Button 
+          className={`w-[200px] bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:bg-red-700`}
+          onClick={handleLogout}>
+            Sair
+          </Button>
+        </div> 
+      </LoginCard>
+    </div>
+  );
+};

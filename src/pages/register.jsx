@@ -2,44 +2,34 @@ import LoginCard from "../components/LoginCard"
 import Button from "../components/Button"
 import Input from "../components/Input"
 import Link from "next/link"
-import { useState } from "react"
-import { setCookie } from "cookies-next"
-import { useRouter } from "next/router"
+import { useState } from "react";
+import { auth } from "../lib/firebase";
+import Router from "next/router";
 
-export default function RegisterPage() {
-    const [formData, setFormData] = useState ({
-        name: '',
-        email: '',
-        password: ''
-    })
+export default function SignUp() { //Iniciando função em modo padrão para registro no site
+    const [email, setEmail] = useState(''); // abrindo o useState para o email, a função setEmail será responsável por modificar a variável email. Lembrar sempre se iniciar o state com uma string vazia.
+    const [password, setPassword] = useState(''); //Mesma coisa do Email, porém para a senha.
 
-    const [error, setError] = useState('')
-    const router = useRouter()
+    const handleEmailChange = (event) => { //Função para lidar com a mudança da variável email via input.
+        setEmail(event.target.value);
+    };
 
-    const handleFormEdit = (event, name) => {
-        setFormData({
-            ...formData,
-            [name]: event.target.value
-        })
-    }
+    const handlePasswordChange = (event) => { //Mesma que a anterior porém para a senha.
+        setPassword(event.target.value);
+    };
 
-    const handleForm = async (event) => {
+    const handleSignUp = async (event) => { //Função que fará de fato a criação do usuário quando o form for preenchido e submetido.
+        event.preventDefault(); //Importante não esquecer de impedir que o botão/formulário faça algo fora do desejável.
+
         try {
-            event.preventDefault()
-            const response = await fetch(`/api/user/cadastro`, {
-                method: 'POST',
-                body: JSON.stringify(formData)
-            })
-
-            const json = await response.json()
-            if (response.status !== 201) throw new Error(json)
-
-            setCookie('authorization', json)
-            router.push('/login')
+            await auth.createUserWithEmailAndPassword(email, password); //função assincrona para conectar ao banco com email e senha a serem persistidos no novo usuário.
+            console.log('Usuário cadastrado com sucesso!'); //Confirmação de cadastro. no futuro transformar isso aqui em algo que o usuário possa verificar.
+            Router.push('/login'); //Redireciona o usuário após a criação do cadastro.
         } catch (error) {
-            setError(error.message)
-        }
-    }
+            console.log('Erro ao cadastrar usuário:', error.message);
+        };
+    };
+
 
     return (
         <div className={`
@@ -47,12 +37,10 @@ export default function RegisterPage() {
             flex justify-center items-center
         `}>
             <LoginCard tittle="Crie sua conta">
-            <form onSubmit={handleForm} className=" flex flex-col gap-2 mt-4">
-                    <Input type="text" placeholder="Seu nome" required value={formData.name} onChange={(e) => {handleFormEdit(e, 'name')}} />
-                    <Input type="email" placeholder="Seu e-mail" required value={formData.email} onChange={(e) => {handleFormEdit(e, 'email')}} />
-                    <Input type="password" placeholder="Sua senha" required value={formData.password} onChange={(e) => {handleFormEdit(e, 'password')}} />
-                    <Button>Cadastrar</Button>
-                    {error && <p className="text-red-500 font-bold">{error}</p>}
+            <form onSubmit={handleSignUp} className=" flex flex-col gap-2 mt-4">
+                    <Input type="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
+                    <Input type="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
+                    <Button type='submit'>Cadastrar</Button>
                     <Link href="/login">Já possui uma conta?</Link>
                 </form>
             </LoginCard>
