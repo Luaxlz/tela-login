@@ -3,26 +3,64 @@ import { useRouter } from 'next/router';
 import Button from "../components/Button";
 import LoginCard from "../components/LoginCard";
 import { auth } from "../lib/firebase";
+import { useState } from 'react';
+
+export async function getServerSideProps(context) {
+  // Obter o valor do cookie que contém a informação de autenticação
+  const cookies = context.req.headers.cookie || '';
+  const isAuthenticatedCookie = cookies
+    .split(';')
+    .find((cookie) => cookie.trim().startsWith('isAuthenticated='));
+
+  // Verificar se o usuário está autenticado
+  const isAuthenticated = isAuthenticatedCookie
+    ? isAuthenticatedCookie.split('=')[1] === 'true'
+    : false;
+
+  if (!isAuthenticated) {
+    // Redirecionar para a página de login ou exibir uma mensagem de erro
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  // Retornar outros dados necessários para a página
+  return {
+    props: {
+      // Outros dados necessários para a página
+    },
+  };
+}
 
 
 export default function Home() {
+  // A DOM só será renderizada se o usuário estiver autenticado
+  // Você pode acessar o objeto `user` retornado por `getServerSideProps` aqui
+
   const router = useRouter()
+  const [userDisplayName, setUserDisplayName] = useState('');
+  const [userGender, setUserGender] = useState('');
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push('/login'); // Redireciona para a página de login caso o usuário não esteja autenticado
+    const fetchUserDisplayName = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        await user.reload(); // Atualiza as informações do usuário
+        setUserDisplayName(user.displayName || 'Usuário');
+        setUserGender(user.gender || 'Outro');
       }
-    });
-  
-    return () => unsubscribe(); // Cancela a inscrição do listener ao desmontar o componente
+    };
+
+    fetchUserDisplayName();
   }, []);
-  
 
   function handleLogout(event) {
     auth.signOut()
       .then(() => {
-        Router.push('/login');
+        router.push('/login');
       })
       .catch((error) => {
         console.log('Erro ao efetuar logout:', error.message);
@@ -32,7 +70,13 @@ export default function Home() {
   return (
     <div className="flex justify-center items-center h-screen">
       <LoginCard>
-        <h1 className="text-center text-[56px]">Bem Vindo!</h1>
+        <div>
+          {userDisplayName ? (
+            <h1 className="text-center text-[46px]">Bem-{userGender === 'Feminino' ? 'vinda' : 'vindo'}, {userDisplayName}!</h1>
+          ) : (
+            <h1 className="text-center text-[56px]"> </h1>
+        )}
+        </div>
         <div className="flex justify-around">
           <Button 
           className={`w-[200px] bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:bg-red-700`}

@@ -24,6 +24,8 @@ export default function Login() {
         try {
             await auth.signInWithEmailAndPassword(email, password);
             console.log('Usuário logado com sucesso!');
+            const isAuthenticated = true;
+            document.cookie = `isAuthenticated=${isAuthenticated}`;
             Router.push('/');
         } catch (error) {
             console.log('Houve um erro ao entrar:', error.message);
