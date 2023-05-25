@@ -21,7 +21,7 @@ export async function getServerSideProps(context) {
     // Redirecionar para a página de login ou exibir uma mensagem de erro
     return {
       redirect: {
-        destination: '/login',
+        destination: '/loginType',
         permanent: false,
       },
     };
@@ -42,7 +42,6 @@ export default function Home() {
 
   const router = useRouter()
   const [userDisplayName, setUserDisplayName] = useState('');
-  const [userGender, setUserGender] = useState('');
 
   useEffect(() => {
     const fetchUserDisplayName = async () => {
@@ -50,7 +49,6 @@ export default function Home() {
       if (user) {
         await user.reload(); // Atualiza as informações do usuário
         setUserDisplayName(user.displayName || 'Usuário');
-        setUserGender(user.gender || 'Outro');
       }
     };
 
@@ -72,7 +70,7 @@ export default function Home() {
       <LoginCard>
         <div>
           {userDisplayName ? (
-            <h1 className="text-center text-[46px]">Bem-{userGender === 'Feminino' ? 'vinda' : 'vindo'}, {userDisplayName}!</h1>
+            <h1 className="text-center text-[46px]">Bem Vindo(a), {userDisplayName}!</h1>
           ) : (
             <h1 className="text-center text-[56px]"> </h1>
         )}

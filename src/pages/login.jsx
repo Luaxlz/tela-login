@@ -5,10 +5,13 @@ import LoginCard from "../components/LoginCard";
 import { useState } from "react";
 import { auth } from "../lib/firebase";
 import Router from "next/router";
+import style from '../styles/basicPage.module.css'
+import Label from "../components/Label";
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
     const handleEmailChange = (event) => {
         setEmail(event.target.value);
@@ -17,6 +20,20 @@ export default function Login() {
     const handlePasswordChange = (event) => {
         setPassword(event.target.value);
     };
+
+    function getErrorMessage(errorCode) {
+        switch (errorCode) {
+          case 'auth/invalid-email':
+            return 'Email inválido. Por favor, verifique o email informado.';
+          case 'auth/user-not-found':
+            return 'Usuário não encontrado.';
+          case 'auth/wrong-password':
+            return 'Senha incorreta.';
+          // Adicionar outros códigos de erro e suas respectivas mensagens em português aqui
+          default:
+            return 'Ocorreu um erro durante a autenticação.';
+        }
+      }
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -28,25 +45,23 @@ export default function Login() {
             document.cookie = `isAuthenticated=${isAuthenticated}`;
             Router.push('/');
         } catch (error) {
+            setError(getErrorMessage(error.code))
             console.log('Houve um erro ao entrar:', error.message);
         };
     };
 
     return (
-        <div className={`
-        bg-gradient-to-b from-black via-gray-900 to-gray-800 w-screen h-screen
-            flex justify-center items-center
-
-        `}>
-            <LoginCard tittle='Entre em sua conta' >
-                <form onSubmit={handleLogin} className=" flex flex-col gap-3 w-auto mt-4">
-                    <Input type="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
-                    <Input type="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
-                    <Button type='submit' >Entrar</Button>
-                    <div className="flex justify-around">
-                        <Link href="/register">Ainda não possui conta?</Link>
-                        <Link href="/loginSelection">Fazer login de outra forma?</Link>
-                    </div>
+        <div className={`${style.basicPage}`}>
+            <LoginCard tittle='Por favor digite suas informações de login' >
+                <form onSubmit={handleLogin} className=" flex flex-col w-auto mt-4">
+                    <Label htmlFor="email">E-mail</Label>
+                    <Input type="email" id="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
+                    <Label htmlFor="password">Senha</Label>
+                    <Input type="password" id="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
+                    {error && <p className="text-red-600 font-medium mb-0 p-0">{error}</p>}
+                    <Link className="self-center mt-1 mb-4 text-[#19A7CE]" href="#">Esqueceu sua senha?</Link>
+                    <Button type='submit' >Entrar →</Button>
+                    <Link className="self-center mt-4 text-[1rem] font-medium" href="/register">Ainda não possui conta?</Link>
                 </form>
             </LoginCard>
         </div>

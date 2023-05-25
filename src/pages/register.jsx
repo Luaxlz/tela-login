@@ -5,12 +5,15 @@ import Link from "next/link"
 import { useState } from "react";
 import { auth } from "../lib/firebase";
 import Router from "next/router";
+import style from '../styles/basicPage.module.css'
+import Label from "../components/Label";
 
 export default function SignUp() { //Iniciando função em modo padrão para registro no site
     const [email, setEmail] = useState(''); // abrindo o useState para o email, a função setEmail será responsável por modificar a variável email. Lembrar sempre se iniciar o state com uma string vazia.
     const [password, setPassword] = useState(''); //Mesma coisa do Email, porém para a senha.
     const [name, setName] = useState('');
-    const [gender, setGender] = useState('');
+    const [cpf, setCpf] = useState('');
+    const [error, setError] = useState('');
     const user = auth.currentUser;
 
     const handleEmailChange = (event) => { //Função para lidar com a mudança da variável email via input.
@@ -25,9 +28,33 @@ export default function SignUp() { //Iniciando função em modo padrão para reg
         setName(event.target.value);
     }
 
-    const handleGenderChange = (event) => {
-        setGender(event.target.value);
-    }
+    const handleCpfChange = (event) => {
+        let value = event.target.value;
+        
+        // Remove qualquer caractere não numérico
+        value = value.replace(/\D/g, '');
+    
+        // Formata o CPF
+        if (value.length <= 11) {
+          value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+    
+        setCpf(value);
+      };
+
+      function getErrorMessage(errorCode) {
+        switch (errorCode) {
+          case 'auth/email-already-in-use':
+            return 'O email informado já está sendo usado por outra conta.';
+          case 'auth/invalid-email':
+            return 'Email inválido. Por favor, verifique o email informado.';
+          case 'auth/weak-password':
+            return 'A senha deve ter no mínimo 6 caracteres.';
+          // Adicione outros códigos de erro e suas respectivas mensagens em português aqui
+          default:
+            return 'Ocorreu um erro durante a criação do usuário.';
+        }
+      }
 
     const handleSignUp = async (event) => { //Função que fará de fato a criação do usuário quando o form for preenchido e submetido.
         event.preventDefault(); //Importante não esquecer de impedir que o botão/formulário faça algo fora do desejável.
@@ -38,7 +65,6 @@ export default function SignUp() { //Iniciando função em modo padrão para reg
             const user = auth.currentUser;
             await user.updateProfile({
                 displayName: name,
-                gender: gender,
               })
                 .then(() => {
                   // Ação a ser executada após a atualização do perfil
@@ -46,31 +72,26 @@ export default function SignUp() { //Iniciando função em modo padrão para reg
                 })
         } catch (error) {
             console.log('Erro ao cadastrar usuário:', error.message);
+            setError(getErrorMessage(error.code))
         };
     };
 
 
     return (
-        <div className={`
-            bg-gradient-to-b from-black via-gray-900 to-gray-800 w-screen h-screen
-            flex justify-center items-center
-        `}>
-            <LoginCard tittle="Crie sua conta">
-            <form onSubmit={handleSignUp} className=" flex flex-col gap-2 mt-4">
-                    <Input type="text" placeholder="Seu nome" value={name} onChange={handleNameChange} />
-                    <select className={`border-0 rounded-lg outline-none bg-gray-200 p-2`} 
-                        value={gender} onChange={handleGenderChange}>
-                        <option value="" disabled>
-                            Selecione seu gênero
-                        </option>
-                        <option value="Masculino">Masculino</option>
-                        <option value="Feminino">Feminino</option>
-                        <option value="Outro">Outro</option>
-                    </select>
-                    <Input type="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
-                    <Input type="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
+        <div className={`${style.basicPage}`}>
+            <LoginCard tittle="Por favor informe os dados de cadastro">
+                <form onSubmit={handleSignUp} className=" flex flex-col mt-4">
+                    <Label htmlFor="name">Nome</Label>
+                    <Input type="text" id="name" placeholder="Seu nome" value={name} onChange={handleNameChange} />
+                    <Label htmlFor="cpf">CPF</Label>
+                    <Input type="text" id="cpf" value={cpf} onChange={handleCpfChange} placeholder="000.000.000-00" maxLength="14" />
+                    <Label htmlFor="email">E-mail</Label>
+                    <Input type="email" id="email" placeholder="Seu e-mail" value={email} onChange={handleEmailChange} />
+                    <Label htmlFor="password">Senha</Label>
+                    <Input type="password" id="password" placeholder="Sua senha" value={password} onChange={handlePasswordChange} />
+                    {error && <p className="text-red-600 font-medium mt-0 mb-3 p-0">{error}</p>}
                     <Button type='submit'>Cadastrar</Button>
-                    <Link href="/login">Já possui uma conta?</Link>
+                    <Link className="self-center mt-4 text-[1rem] font-medium" href="/login">Já possui uma conta?</Link>
                 </form>
             </LoginCard>
         </div>
