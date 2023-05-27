@@ -4,6 +4,8 @@ import Button from "../components/Button";
 import LoginCard from "../components/LoginCard";
 import { auth } from "../lib/firebase";
 import { useState } from 'react';
+import LogoutButton from '../components/LogoutButton'
+import { FaSignOutAlt } from 'react-icons/fa';
 
 export async function getServerSideProps(context) {
   // Obter o valor do cookie que contém a informação de autenticação
@@ -55,15 +57,7 @@ export default function Home() {
     fetchUserDisplayName();
   }, []);
 
-  function handleLogout(event) {
-    auth.signOut()
-      .then(() => {
-        router.push('/login');
-      })
-      .catch((error) => {
-        console.log('Erro ao efetuar logout:', error.message);
-      });
-  }
+  
   
   return (
     <div className="flex justify-center items-center h-screen">
@@ -76,11 +70,11 @@ export default function Home() {
         )}
         </div>
         <div className="flex justify-around">
-          <Button 
-          className={`w-[200px] bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:bg-red-700`}
-          onClick={handleLogout}>
-            Sair
-          </Button>
+          <LogoutButton 
+            className={`w-[200px] bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700
+              focus:outline-none focus:bg-red-700 flex justify-center items-center self-center`}>
+            <FaSignOutAlt className='mr-3' /> SAIR
+          </LogoutButton>
         </div> 
       </LoginCard>
     </div>
