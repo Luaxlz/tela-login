@@ -62,6 +62,7 @@ export default function Login() {
                     <Link className="self-center mt-1 mb-4 text-[#19A7CE]" href="#">Esqueceu sua senha?</Link>
                     <Button type='submit' >Entrar →</Button>
                     <Link className="self-center mt-4 text-[1rem] font-medium" href="/register">Ainda não possui conta?</Link>
+                    <Link className="self-center mt-4 text-[1rem] font-medium" href="/loginType">Quero fazer login de outra forma</Link>
                 </form>
             </LoginCard>
         </div>
